@@ -1,9 +1,7 @@
 import telebot
-import json
+from all_json import SETTINGS
 
-settings = json.load(open("settings.json", encoding="utf8"))
-
-bot = telebot.TeleBot(settings["telegram_api_token"], parse_mode=None)
+bot = telebot.TeleBot(SETTINGS["telegram_api_token"], parse_mode=None)
 
 
 @bot.message_handler(func=lambda message: message.chat.type != "group")
