@@ -1,0 +1,5 @@
+{
+  "necessary_worksheets": ["Payments", "Users", "Resets"],
+  "rows_count": 1000,
+  "columns_count": 26
+}
