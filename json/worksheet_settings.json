@@ -4,7 +4,7 @@
   "columns_count": 26,
   "worksheets_headers": {
     "Payments": ["user_id", "amount", "purpose", "date", "discarded"],
-    "Users": ["user_id", "username", "balance"],
+    "Users": ["user_id", "username", "balance", "joined"],
     "Resets": ["reset_id", "date", "description"],
     "Joinings": ["user_id", "join", "date"]
   }
