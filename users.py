@@ -36,13 +36,21 @@ def edit_joined(user_id, username, joined):
     if info_about_user:
         row, info = info_about_user
 
-        if info[3] == joined and joined == 1:
+        if info[3] == joined and joined:
             return "User @{} already joined"
-        elif info[3] == joined and joined == 0:
+        elif info[3] == joined and not joined:
             return "User @{} already left"
+
+        WORKSHEET.update(f"D{row}", joined)
     else:
         add_user(user_id, username, joined)
 
+    # Add joinings
+
+    if joined:
+        return "User @{} joined"
+    else:
+        return "User @{} left"
 
 
 

@@ -17,14 +17,14 @@ def send_welcome(message):
 
 @bot.message_handler(commands=["join"])
 def join_user(message):
-    users.join_user(message.from_user.id, message.from_user.username)
-    bot.reply_to(message, f"User @{message.from_user.username} was joined")
+    answer = users.edit_joined(message.from_user.id, message.from_user.username, 1)
+    bot.reply_to(message, answer.format(message.from_user.username))
 
 
 @bot.message_handler(commands=["leave"])
 def leave_user(message):
-    users.leave_user(message.from_user.id, message.from_user.username)
-    bot.reply_to(message, f"User @{message.from_user.username} was leaved")
+    answer = users.edit_joined(message.from_user.id, message.from_user.username, 0)
+    bot.reply_to(message, answer.format(message.from_user.username))
 
 
 bot.infinity_polling()
