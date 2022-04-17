@@ -1,9 +1,8 @@
 import gspread
 from all_json import SETTINGS, CREDENTIALS_FILENAME, WORKSHEET_SETTINGS as WS_S
 
-gc = gspread.service_account(filename=CREDENTIALS_FILENAME)
-
-sh = gc.open_by_url(SETTINGS["google_spreadsheet_url"])
+GC = gspread.service_account(filename=CREDENTIALS_FILENAME)
+SHEET = GC.open_by_url(SETTINGS["google_spreadsheet_url"])
 
 
 def create_necessary_worksheets(sheet: gspread.Spreadsheet):
@@ -24,10 +23,13 @@ def delete_unnecessary_worksheets(sheet: gspread.Spreadsheet):
             sheet.del_worksheet(worksheet)
 
 
+def fill_worksheets(sheet: gspread.Spreadsheet):
+    for worksheet_name in WS_S["necessary_worksheets"]:
+        sheet.worksheet(worksheet_name).update("A1:Z1", [WS_S["worksheets_headers"][worksheet_name]])
+
+
 def reset_spreadsheet(sheet: gspread.Spreadsheet):
     create_necessary_worksheets(sheet)
     delete_unnecessary_worksheets(sheet)
     clear_all_worksheets(sheet)
-
-
-reset_spreadsheet(sh)
+    fill_worksheets(sheet)

@@ -1,5 +1,11 @@
 {
-  "necessary_worksheets": ["Payments", "Users", "Resets"],
+  "necessary_worksheets": ["Payments", "Users", "Resets", "Joinings"],
   "rows_count": 1000,
-  "columns_count": 26
+  "columns_count": 26,
+  "worksheets_headers": {
+    "Payments": ["user_id", "amount", "purpose", "date", "discarded"],
+    "Users": ["user_id", "username", "balance"],
+    "Resets": ["reset_id", "date", "description"],
+    "Joinings": ["user_id", "join", "date"]
+  }
 }
