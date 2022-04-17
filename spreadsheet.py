@@ -1,7 +1,7 @@
 import gspread
-from all_json import SETTINGS
+from all_json import SETTINGS, CREDENTIALS_FILENAME
 
-gc = gspread.service_account("credentials.json")
+gc = gspread.service_account(CREDENTIALS_FILENAME)
 
 sh = gc.open_by_url(SETTINGS["google_spreadsheet_url"])
 
