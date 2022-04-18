@@ -1,8 +1,10 @@
+import json
+import os
 import gspread
-from all_json import SETTINGS, CREDENTIALS_FILENAME, WORKSHEET_SETTINGS as WS_S
 
-GC = gspread.service_account(filename=CREDENTIALS_FILENAME)
-SHEET = GC.open_by_url(SETTINGS["google_spreadsheet_url"])
+GC = gspread.service_account(filename="json/credentials.json")
+SHEET = GC.open_by_url(os.environ["GOOGLE_SPREADSHEET_URL"])
+WS_S = json.load(open("json/worksheet_settings.json", encoding="utf8"))
 
 
 def create_necessary_worksheets(sheet: gspread.Spreadsheet):
@@ -33,3 +35,12 @@ def reset_spreadsheet(sheet: gspread.Spreadsheet):
     delete_unnecessary_worksheets(sheet)
     clear_all_worksheets(sheet)
     fill_worksheets(sheet)
+
+
+def is_opened_spreadsheet_valid():
+    worksheets_titles = [sheet.title for sheet in SHEET.worksheets()]
+    return sorted(worksheets_titles) == sorted(WS_S["necessary_worksheets"])
+
+
+if not is_opened_spreadsheet_valid():
+    reset_spreadsheet(SHEET)

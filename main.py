@@ -1,8 +1,13 @@
+from dotenv import load_dotenv
+load_dotenv()
+
+import os
 import telebot
-from all_json import SETTINGS
 import users
 
-bot = telebot.TeleBot(SETTINGS["telegram_api_token"], parse_mode=None)
+print(os.environ)
+
+bot = telebot.TeleBot(os.environ["TELEGRAM_API_TOKEN"], parse_mode=None)
 
 
 @bot.message_handler(func=lambda message: message.chat.type != "group")
