@@ -1,11 +1,21 @@
 from dotenv import load_dotenv
 load_dotenv()
 
+import firebase_admin
+from firebase_admin import credentials
 import os
 import telebot
 import users
 
-print(os.environ)
+
+firebase_cred = credentials.Certificate({
+    "type": "service_account",
+    "project_id": os.environ["FIREBASE_PROJECT_ID"],
+    "private_key": os.environ["FIREBASE_PRIVATE_KEY"],
+    "client_email": os.environ["FIREBASE_CLIENT_EMAIL"],
+    "token_uri": "https://oauth2.googleapis.com/token",
+})
+default_app = firebase_admin.initialize_app(firebase_cred)
 
 bot = telebot.TeleBot(os.environ["TELEGRAM_API_TOKEN"], parse_mode=None)
 
@@ -32,4 +42,5 @@ def leave_user(message):
     bot.reply_to(message, answer.format(message.from_user.username))
 
 
+print("Bot started!")
 bot.infinity_polling()
