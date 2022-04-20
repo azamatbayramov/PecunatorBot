@@ -16,7 +16,7 @@ firebase_cred = credentials.Certificate({
     "token_uri": "https://oauth2.googleapis.com/token",
 })
 
-firebase_admin.initialize_app(firebase_cred, {'databaseURL': os.environ["FIREBASE_DATABASE_URL"]})
+firebase_admin.initialize_app(firebase_cred, {"databaseURL": os.environ["FIREBASE_DATABASE_URL"]})
 
 bot = telebot.TeleBot(os.environ["TELEGRAM_API_TOKEN"], parse_mode=None)
 
@@ -26,13 +26,13 @@ def send_welcome_in_not_group(message):
     bot.reply_to(message, "Hello. I work only in groups.\nAdd me to group and I'll work")
 
 
-@bot.message_handler(commands=["init"])
+@bot.message_handler(commands=["start"])
 def init_group(message):
     response = group.Group(message.chat.id).init_group()
     bot.reply_to(message, response["message"])
 
 
-@bot.message_handler(commands=["start", "help"])
+@bot.message_handler(commands=["help"])
 def send_welcome(message):
     bot.reply_to(message, "Hey")
 

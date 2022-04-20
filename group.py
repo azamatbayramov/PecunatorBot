@@ -13,7 +13,7 @@ class Group:
         if not self.is_initialized():
             self.create_groupInfo_in_db()
             return {
-                "result":True,
+                "result": True,
                 "message": "Group has been initialized"
             }
 
@@ -24,16 +24,13 @@ class Group:
             }
 
     def is_initialized(self):
-        if self.get_groupInfo():
-            return True
-        else:
-            return False
+        return self.get_group_info() is not None
 
     def create_groupInfo_in_db(self):
-        return self.ref.set({"groupInfo": {"creationDate": str(datetime.datetime.now())}})
+        return self.ref.set({"group_info": {"creation_date": str(datetime.datetime.now())}})
 
     def add_user(self, userId, username=None):
-        self.users_ref.child(userId).set({"userId": userId, "username": username, "balance": 0})
+        self.users_ref.child(userId).set({"user_id": userId, "username": username, "balance": 0})
 
     def delete_user(self, userId):
         self.users_ref.child(userId).set({})
@@ -51,8 +48,8 @@ class Group:
     def get_users(self):
         return self.ref.child("users").get()
 
-    def get_groupInfo(self):
-        return self.ref.child("groupInfo").get()
+    def get_group_info(self):
+        return self.ref.child("group_info").get()
 
     def get_operations(self):
         return self.ref.child("operations").get()
