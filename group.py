@@ -1,5 +1,4 @@
 from firebase_admin import db
-import json
 import datetime
 
 
@@ -10,13 +9,27 @@ class Group:
         self.ref = db.reference(f"groups/{groupId}")
         self.users_ref = self.ref.child("users")
 
+    def init_group(self):
+        if not self.is_initialized():
+            self.create_groupInfo_in_db()
+            return {
+                "result":True,
+                "message": "Group has been initialized"
+            }
+
+        else:
+            return {
+                "result": False,
+                "message": "Group has already been already initialized"
+            }
+
     def is_initialized(self):
         if self.get_groupInfo():
             return True
         else:
             return False
 
-    def init_in_db(self):
+    def create_groupInfo_in_db(self):
         return self.ref.set({"groupInfo": {"creationDate": str(datetime.datetime.now())}})
 
     def add_user(self, userId, username=None):
