@@ -6,6 +6,7 @@ from firebase_admin import credentials
 import os
 import telebot
 import group
+import user
 
 
 firebase_cred = credentials.Certificate({
@@ -21,6 +22,21 @@ firebase_admin.initialize_app(firebase_cred, {"databaseURL": os.environ["FIREBAS
 bot = telebot.TeleBot(os.environ["TELEGRAM_API_TOKEN"], parse_mode=None)
 
 
+def def_group_and_user(message):
+    g = group.Group(
+        message.chat.id,
+        message.chat.title
+    )
+
+    u = user.User(
+        message.from_user.id,
+        message.from_user.username,
+        f"{message.from_user.first_name}{' ' + message.from_user.last_name if message.from_user.last_name else ''})"
+    )
+
+    return g, u
+
+
 @bot.message_handler(func=lambda message: message.chat.type != "group")
 def send_welcome_in_not_group(message):
     bot.reply_to(message, "Hello. I work only in groups.\nAdd me to group and I'll work")
@@ -28,7 +44,7 @@ def send_welcome_in_not_group(message):
 
 @bot.message_handler(commands=["start"])
 def init_group(message):
-    response = group.Group(message.chat.id).init_group()
+    response = group.Group(message.chat.id).init_group_in_db()
     bot.reply_to(message, response["message"])
 
 
@@ -39,14 +55,31 @@ def send_welcome(message):
 
 @bot.message_handler(commands=["join"])
 def join_user(message):
-    answer = "TODO"#users.edit_joined(message.from_user.id, message.from_user.username, 1)
-    bot.reply_to(message, answer.format(message.from_user.username))
+    g, u = def_group_and_user(message)
+
+    if g.get_user(u.user_id):
+        bot.reply_to(message, "User has already been added")
+    else:
+        g.add_user(u.user_id, u.username)
+        u.add_group(g.group_id, g.group_name)
+
+        bot.reply_to(message, "User added")
 
 
 @bot.message_handler(commands=["leave"])
 def leave_user(message):
-    answer = "TODO"#users.edit_joined(message.from_user.id, message.from_user.username, 0)
-    bot.reply_to(message, answer.format(message.from_user.username))
+    g, u = def_group_and_user(message)
+
+    if g.get_total_balance() == 0:
+        if not g.get_user(u.user_id):
+            bot.reply_to(message, "User has already been deleted")
+        else:
+            g.delete_user(u.user_id)
+            u.delete_group(g.group_id)
+
+            bot.reply_to(message, "User deleted")
+    else:
+        bot.reply_to(message, "You have to finish this period to leave")
 
 
 print("Bot started!")

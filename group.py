@@ -3,14 +3,18 @@ import datetime
 
 
 class Group:
-    def __init__(self, group_id):
-        self.groupId = group_id
+    def __init__(self, group_id, group_name):
+        self.group_id = str(group_id)
+        self.group_name = group_name
 
         self.ref = db.reference(f"groups/{group_id}")
         self.users_ref = self.ref.child("users")
 
-    def init_group(self):
-        if not self.is_initialized():
+        self.init_group_in_db()
+
+    # Initialization
+    def init_group_in_db(self):
+        if not self.is_initialized_in_db():
             self.create_group_info_in_db()
             return {
                 "result": True,
@@ -23,14 +27,27 @@ class Group:
                 "message": "Group has already been already initialized"
             }
 
-    def is_initialized(self):
+    def is_initialized_in_db(self):
         return self.get_group_info() is not None
 
+    # Group info
     def create_group_info_in_db(self):
-        return self.ref.set({"group_info": {"creation_datetime": str(datetime.datetime.now())}})
+        return self.ref.set(
+            {"group_info": {"creation_datetime": datetime.datetime.now().timestamp(),
+                            "group_name": self.group_name,
+                            "total_balance": 0
+                            }}
+        )
 
+    def get_group_info(self):
+        return self.ref.child("group_info").get()
+
+    def get_total_balance(self):
+        return self.ref.child("group_info/total_balance").get()
+
+    # Users
     def add_user(self, user_id, username=None):
-        self.users_ref.child(user_id).set({"user_id": user_id, "username": username, "balance": 0})
+        self.users_ref.child(user_id).set({"username": username, "balance": 0})
 
     def delete_user(self, user_id):
         self.users_ref.child(user_id).set({})
@@ -46,10 +63,8 @@ class Group:
         return self.users_ref.child(user_id).get()
 
     def get_users(self):
-        return self.ref.child("users").get()
+        return self.users_ref.get()
 
-    def get_group_info(self):
-        return self.ref.child("group_info").get()
-
+    # Operations
     def get_operations(self):
         return self.ref.child("operations").get()
