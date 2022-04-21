@@ -27,7 +27,7 @@ class Group:
         return self.get_group_info() is not None
 
     def create_group_info_in_db(self):
-        return self.ref.set({"group_info": {"creation_date": str(datetime.datetime.now())}})
+        return self.ref.set({"group_info": {"creation_datetime": str(datetime.datetime.now())}})
 
     def add_user(self, user_id, username=None):
         self.users_ref.child(user_id).set({"user_id": user_id, "username": username, "balance": 0})
