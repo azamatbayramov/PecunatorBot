@@ -1,5 +1,5 @@
 from firebase_admin import db
-import datetime
+import datetime as dt
 
 
 class Group:
@@ -9,6 +9,7 @@ class Group:
 
         self.ref = db.reference(f"groups/{group_id}")
         self.users_ref = self.ref.child("users")
+        self.operations_ref = self.ref.child("operations")
 
         self.init_group_in_db()
 
@@ -33,7 +34,7 @@ class Group:
     # Group info
     def create_group_info_in_db(self):
         return self.ref.set(
-            {"group_info": {"creation_datetime": datetime.datetime.now().timestamp(),
+            {"group_info": {"creation_datetime": dt.datetime.now().timestamp(),
                             "group_name": self.group_name,
                             "total_balance": 0
                             }}
@@ -45,6 +46,12 @@ class Group:
     def get_total_balance(self):
         return self.ref.child("group_info/total_balance").get()
 
+    def edit_total_balance(self, diff):
+        current_balance = self.get_total_balance()
+        self.ref.child("group_info").update({"total_balance": current_balance + diff})
+
+        return current_balance + diff
+
     # Users
     def add_user(self, user_id, username=None):
         self.users_ref.child(user_id).set({"username": username, "balance": 0})
@@ -55,7 +62,7 @@ class Group:
     def edit_username(self, user_id, username):
         self.users_ref.child(user_id).update({"username": username})
 
-    def edit_balance(self, user_id, diff):
+    def edit_user_balance(self, user_id, diff):
         current_balance = self.get_user(user_id)["balance"]
         self.users_ref.child(user_id).update({"balance": current_balance + diff})
 
@@ -67,4 +74,20 @@ class Group:
 
     # Operations
     def get_operations(self):
-        return self.ref.child("operations").get()
+        return self.operations_ref.get()
+
+    def add_operation(self, d):
+        self.operations_ref.push(d)
+
+    def add_payment(self, author, amount, label):
+        self.add_operation({
+            "type": "payment",
+            "author": author,
+            "datetime": dt.datetime.now().timestamp(),
+            "is_discarded": False,
+            "amount": amount,
+            "label": label
+        })
+
+    def add_reset(self, author):
+        pass
