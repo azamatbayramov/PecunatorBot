@@ -60,7 +60,7 @@ def join_user(message):
         bot.reply_to(message, "User has already been added")
     else:
         g.add_user(u)
-        u.add_group(g.group_id, g.group_name)
+        u.add_group(g)
 
         bot.reply_to(message, "User added")
 
@@ -74,7 +74,7 @@ def leave_user(message):
             bot.reply_to(message, "User has already been deleted")
         else:
             g.delete_user(u)
-            u.delete_group(g.group_id)
+            u.delete_group(g)
 
             bot.reply_to(message, "User deleted")
     else:
@@ -104,7 +104,7 @@ def purchase(message):
     g.add_payment(u, amount, label)
     g.edit_user_balance(u, amount)
     total_balance = g.edit_total_balance(amount)
-    u.edit_balance(g.group_id, amount)
+    u.edit_balance(g, amount)
 
     bot.reply_to(message, f"Purchase added. Total balance of group: {total_balance}")
 
@@ -115,12 +115,15 @@ def total(message):
 
     users = g.get_users()
 
-    lst = [f"Total balance: {g.get_total_balance()}", '']
+    if users:
+        lst = [f"Total balance: {g.get_total_balance()}", '']
 
-    for user_id in users.keys():
-        lst.append(f"@{users[user_id]['username']}: {users[user_id]['balance']}")
+        for user_id in users.keys():
+            lst.append(f"@{users[user_id]['username']}: {users[user_id]['balance']}")
 
-    bot.reply_to(message, '\n'.join(lst))
+        bot.reply_to(message, '\n'.join(lst))
+    else:
+        bot.reply_to(message, "It's so deserted here")
 
 
 @bot.message_handler(commands=["reset"])
@@ -138,8 +141,9 @@ def reset(message):
     g.add_reset(u)
 
     for i in g.get_users():
-        g.reset_user_balance(user.User(i))
-        user.User(i).reset_group_balance(g.group_id)
+        ui = user.User(i)
+        g.reset_user_balance(ui)
+        ui.reset_group_balance(g)
 
     g.reset_total_balance()
 

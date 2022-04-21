@@ -41,24 +41,24 @@ class User:
         return self.ref.child("user_info").get()
 
     # Groups
-    def add_group(self, group_id, group_name=None):
-        self.groups_ref.child(group_id).set({"group_name": group_name, "balance": 0})
+    def add_group(self, group):
+        self.groups_ref.child(group.id).set({"group_name": group.name, "balance": 0})
 
-    def delete_group(self, group_id):
-        self.groups_ref.child(group_id).set({})
+    def delete_group(self, group):
+        self.groups_ref.child(group.id).set({})
 
-    def edit_group_name(self, group_id, group_name):
-        self.groups_ref.child(group_id).update({"group_name": group_name})
+    def edit_group_name(self, group):
+        self.groups_ref.child(group.id).update({"group_name": group.name})
 
-    def edit_balance(self, group_id, diff):
-        current_balance = self.get_group(group_id)["balance"]
-        self.groups_ref.child(group_id).update({"balance": current_balance + diff})
+    def edit_balance(self, group, diff):
+        current_balance = self.get_group(group)["balance"]
+        self.groups_ref.child(group.id).update({"balance": current_balance + diff})
 
-    def get_group(self, group_id):
-        return self.groups_ref.child(group_id).get()
+    def get_group(self, group):
+        return self.groups_ref.child(group.id).get()
 
     def get_groups(self):
         return self.groups_ref.get()
 
-    def reset_group_balance(self, group_id):
-        self.groups_ref.child(group_id).update({"balance": 0})
+    def reset_group_balance(self, group):
+        self.groups_ref.child(group.id).update({"balance": 0})
