@@ -3,9 +3,11 @@ import firebase_admin
 from firebase_admin import credentials
 import os
 import telebot
-import group
 import user
+from utils import get_group_and_user
 
+# This line should be placed before ANY logic
+# Beware of imports that execute something immediately
 load_dotenv()
 
 firebase_cred = credentials.Certificate({
@@ -21,30 +23,22 @@ firebase_admin.initialize_app(firebase_cred, {"databaseURL": os.environ["FIREBAS
 bot = telebot.TeleBot(os.environ["TELEGRAM_API_TOKEN"], parse_mode=None)
 
 
-def get_group_and_user(message):
-    g = group.Group(
-        message.chat.id,
-        message.chat.title
-    )
-
-    u = user.User(
-        message.from_user.id,
-        message.from_user.username,
-        f"{message.from_user.first_name}{' ' + message.from_user.last_name if message.from_user.last_name else ''})"
-    )
-
-    return g, u
-
-
 @bot.message_handler(func=lambda message: message.chat.type != "group")
 def send_welcome_in_not_group(message):
     bot.reply_to(message, "Hello. I work only in groups.\nAdd me to group and I'll work")
 
 
 @bot.message_handler(commands=["start"])
-def init_group(message):
-    response = group.Group(message.chat.id).init_group_in_db()
-    bot.reply_to(message, response["message"])
+def start(message):
+    g, u = get_group_and_user(message)
+
+    if not g.exists():
+        g.init_in_db()
+        bot.reply_to(message, "This group has been initialized. Welcome!")
+    elif not g.get_user(u):
+        g.add_user(u)
+        bot.reply_to(message, "You have been added to this group")
+    else: bot.reply_to(message, "You are already a member of this group")
 
 
 @bot.message_handler(commands=["help"])
@@ -57,12 +51,11 @@ def join_user(message):
     g, u = get_group_and_user(message)
 
     if g.get_user(u):
-        bot.reply_to(message, "User has already been added")
+        bot.reply_to(message, "You are already a member of this group")
     else:
         g.add_user(u)
         u.add_group(g)
-
-        bot.reply_to(message, "User added")
+        bot.reply_to(message, "You have been added to this group")
 
 
 @bot.message_handler(commands=["leave"])
@@ -71,14 +64,14 @@ def leave_user(message):
 
     if g.get_total_balance() == 0:
         if not g.get_user(u):
-            bot.reply_to(message, "User has already been deleted")
+            bot.reply_to(message, "You are not in the group")
         else:
             g.delete_user(u)
             u.delete_group(g)
 
-            bot.reply_to(message, "User deleted")
+            bot.reply_to(message, "Goodbye! You have left the group")
     else:
-        bot.reply_to(message, "You have to finish this period to leave")
+        bot.reply_to(message, "You have to finish this period to leave the group")
 
 
 @bot.message_handler(commands=["purchase"])

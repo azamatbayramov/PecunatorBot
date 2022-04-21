@@ -11,25 +11,14 @@ class Group:
         self.users_ref = self.ref.child("users")
         self.operations_ref = self.ref.child("operations")
 
-        self.init_group_in_db()
-
     # Initialization
-    def init_group_in_db(self):
-        if not self.is_initialized_in_db():
-            self.create_group_info_in_db()
-            return {
-                "result": True,
-                "message": "Group has been initialized"
-            }
+    def init_in_db(self):
+        self.create_group_info_in_db()
+        # We need this as a function because
+        # we might have to init more stuff later
 
-        else:
-            return {
-                "result": False,
-                "message": "Group has already been already initialized"
-            }
-
-    def is_initialized_in_db(self):
-        return self.get_group_info() is not None
+    def exists(self):
+        return self.ref.child("group_info").get() is not None
 
     # Group info
     def create_group_info_in_db(self):
