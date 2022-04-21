@@ -59,3 +59,6 @@ class User:
 
     def get_groups(self):
         return self.groups_ref.get()
+
+    def reset_group_balance(self, group_id):
+        self.groups_ref.child(group_id).update({"balance": 0})

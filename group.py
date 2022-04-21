@@ -72,6 +72,9 @@ class Group:
     def get_users(self):
         return self.users_ref.get()
 
+    def reset_user_balance(self, user_id):
+        self.users_ref.child(user_id).update({"balance": 0})
+
     # Operations
     def get_operations(self):
         return self.operations_ref.get()
@@ -90,4 +93,17 @@ class Group:
         })
 
     def add_reset(self, author):
-        pass
+        snapshot = dict()
+
+        users = self.get_users()
+
+        for user_id in users.keys():
+            snapshot[user_id] = users[user_id]["balance"]
+
+        self.add_operation({
+            "type": "reset",
+            "author": author,
+            "datetime": dt.datetime.now().timestamp(),
+            "is_discarded": False,
+            "snapshot": snapshot,
+        })

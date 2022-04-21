@@ -124,5 +124,25 @@ def total(message):
     bot.reply_to(message, '\n'.join(lst))
 
 
+@bot.message_handler(commands=["reset"])
+def reset(message):
+    g, u = get_group_and_user(message)
+
+    if not g.get_user(u.user_id):
+        bot.reply_to(message, "User not added")
+        return
+
+    if g.get_total_balance() == 0:
+        bot.reply_to(message, "Total balance is 0")
+        return
+
+    g.add_reset(u.user_id)
+    for i in g.get_users():
+        g.reset_user_balance(i)
+        user.User(i).reset_group_balance(g.group_id)
+
+    bot.reply_to(message, "Reset completed")
+
+
 print("Bot started!")
 bot.infinity_polling()
