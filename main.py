@@ -110,5 +110,19 @@ def purchase(message):
     bot.reply_to(message, f"Purchase added. Total balance of group: {total_balance}")
 
 
+@bot.message_handler(commands=["total"])
+def total(message):
+    g, u = get_group_and_user(message)
+
+    users = g.get_users()
+
+    lst = []
+
+    for user_id in users.keys():
+        lst.append(f"@{users[user_id]['username']}: {users[user_id]['balance']}")
+
+    bot.reply_to(message, '\n'.join(lst))
+
+
 print("Bot started!")
 bot.infinity_polling()
