@@ -3,15 +3,15 @@ import datetime
 
 
 class Group:
-    def __init__(self, groupId):
-        self.groupId = groupId
+    def __init__(self, group_id):
+        self.groupId = group_id
 
-        self.ref = db.reference(f"groups/{groupId}")
+        self.ref = db.reference(f"groups/{group_id}")
         self.users_ref = self.ref.child("users")
 
     def init_group(self):
         if not self.is_initialized():
-            self.create_groupInfo_in_db()
+            self.create_group_info_in_db()
             return {
                 "result": True,
                 "message": "Group has been initialized"
@@ -26,24 +26,24 @@ class Group:
     def is_initialized(self):
         return self.get_group_info() is not None
 
-    def create_groupInfo_in_db(self):
+    def create_group_info_in_db(self):
         return self.ref.set({"group_info": {"creation_date": str(datetime.datetime.now())}})
 
-    def add_user(self, userId, username=None):
-        self.users_ref.child(userId).set({"user_id": userId, "username": username, "balance": 0})
+    def add_user(self, user_id, username=None):
+        self.users_ref.child(user_id).set({"user_id": user_id, "username": username, "balance": 0})
 
-    def delete_user(self, userId):
-        self.users_ref.child(userId).set({})
+    def delete_user(self, user_id):
+        self.users_ref.child(user_id).set({})
 
-    def edit_username(self, userId, username):
-        self.users_ref.child(userId).update({"username": username})
+    def edit_username(self, user_id, username):
+        self.users_ref.child(user_id).update({"username": username})
 
-    def edit_balance(self, userId, diff):
-        current_balance = self.get_user(userId)["balance"]
-        self.users_ref.child(userId).update({"balance": current_balance + diff})
+    def edit_balance(self, user_id, diff):
+        current_balance = self.get_user(user_id)["balance"]
+        self.users_ref.child(user_id).update({"balance": current_balance + diff})
 
-    def get_user(self, userId):
-        return self.users_ref.child(userId).get()
+    def get_user(self, user_id):
+        return self.users_ref.child(user_id).get()
 
     def get_users(self):
         return self.ref.child("users").get()
