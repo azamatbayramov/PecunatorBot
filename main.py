@@ -116,7 +116,7 @@ def total(message):
 
     users = g.get_users()
 
-    lst = []
+    lst = [f"Total balance: {g.get_total_balance()}", '']
 
     for user_id in users.keys():
         lst.append(f"@{users[user_id]['username']}: {users[user_id]['balance']}")
@@ -140,6 +140,7 @@ def reset(message):
     for i in g.get_users():
         g.reset_user_balance(i)
         user.User(i).reset_group_balance(g.group_id)
+    g.reset_total_balance()
 
     bot.reply_to(message, "Reset completed")
 

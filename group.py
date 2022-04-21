@@ -52,6 +52,9 @@ class Group:
 
         return current_balance + diff
 
+    def reset_total_balance(self):
+        self.ref.child("group_info").update({"total_balance": 0})
+
     # Users
     def add_user(self, user_id, username=None):
         self.users_ref.child(user_id).set({"username": username, "balance": 0})
