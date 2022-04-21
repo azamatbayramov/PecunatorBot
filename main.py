@@ -1,6 +1,4 @@
 from dotenv import load_dotenv
-load_dotenv()
-
 import firebase_admin
 from firebase_admin import credentials
 import os
@@ -8,6 +6,7 @@ import telebot
 import group
 import user
 
+load_dotenv()
 
 firebase_cred = credentials.Certificate({
     "type": "service_account",
@@ -57,10 +56,10 @@ def send_welcome(message):
 def join_user(message):
     g, u = get_group_and_user(message)
 
-    if g.get_user(u.user_id):
+    if g.get_user(u):
         bot.reply_to(message, "User has already been added")
     else:
-        g.add_user(u.user_id, u.username)
+        g.add_user(u)
         u.add_group(g.group_id, g.group_name)
 
         bot.reply_to(message, "User added")
@@ -71,10 +70,10 @@ def leave_user(message):
     g, u = get_group_and_user(message)
 
     if g.get_total_balance() == 0:
-        if not g.get_user(u.user_id):
+        if not g.get_user(u):
             bot.reply_to(message, "User has already been deleted")
         else:
-            g.delete_user(u.user_id)
+            g.delete_user(u)
             u.delete_group(g.group_id)
 
             bot.reply_to(message, "User deleted")
@@ -86,7 +85,7 @@ def leave_user(message):
 def purchase(message):
     g, u = get_group_and_user(message)
 
-    if not g.get_user(u.user_id):
+    if not g.get_user(u):
         bot.reply_to(message, "User not added")
         return
     command_lst = message.text.split()
@@ -102,8 +101,8 @@ def purchase(message):
         bot.reply_to(message, "Wrong format")
         return
 
-    g.add_payment(u.user_id, amount, label)
-    g.edit_user_balance(u.user_id, amount)
+    g.add_payment(u, amount, label)
+    g.edit_user_balance(u, amount)
     total_balance = g.edit_total_balance(amount)
     u.edit_balance(g.group_id, amount)
 
@@ -128,7 +127,7 @@ def total(message):
 def reset(message):
     g, u = get_group_and_user(message)
 
-    if not g.get_user(u.user_id):
+    if not g.get_user(u):
         bot.reply_to(message, "User not added")
         return
 
@@ -136,10 +135,12 @@ def reset(message):
         bot.reply_to(message, "Total balance is 0")
         return
 
-    g.add_reset(u.user_id)
+    g.add_reset(u)
+
     for i in g.get_users():
-        g.reset_user_balance(i)
+        g.reset_user_balance(user.User(i))
         user.User(i).reset_group_balance(g.group_id)
+
     g.reset_total_balance()
 
     bot.reply_to(message, "Reset completed")

@@ -1,5 +1,6 @@
 from firebase_admin import db
 import datetime as dt
+import user as usr
 
 
 class Group:
@@ -56,27 +57,27 @@ class Group:
         self.ref.child("group_info").update({"total_balance": 0})
 
     # Users
-    def add_user(self, user_id, username=None):
-        self.users_ref.child(user_id).set({"username": username, "balance": 0})
+    def add_user(self, user: usr.User):
+        self.users_ref.child(user.id).set({"username": user.username, "balance": 0})
 
-    def delete_user(self, user_id):
-        self.users_ref.child(user_id).set({})
+    def delete_user(self, user: usr.User):
+        self.users_ref.child(user.id).set({})
 
-    def edit_username(self, user_id, username):
-        self.users_ref.child(user_id).update({"username": username})
+    def edit_username(self, user: usr.User):
+        self.users_ref.child(user.id).update({"username": user.username})
 
-    def edit_user_balance(self, user_id, diff):
-        current_balance = self.get_user(user_id)["balance"]
-        self.users_ref.child(user_id).update({"balance": current_balance + diff})
+    def edit_user_balance(self, user: usr.User, diff):
+        current_balance = self.get_user(user)["balance"]
+        self.users_ref.child(user.id).update({"balance": current_balance + diff})
 
-    def get_user(self, user_id):
-        return self.users_ref.child(user_id).get()
+    def get_user(self, user: usr.User):
+        return self.users_ref.child(user.id).get()
 
     def get_users(self):
         return self.users_ref.get()
 
-    def reset_user_balance(self, user_id):
-        self.users_ref.child(user_id).update({"balance": 0})
+    def reset_user_balance(self, user: usr.User):
+        self.users_ref.child(user.id).update({"balance": 0})
 
     # Operations
     def get_operations(self):
@@ -85,17 +86,17 @@ class Group:
     def add_operation(self, d):
         self.operations_ref.push(d)
 
-    def add_payment(self, author, amount, label):
+    def add_payment(self, author: usr.User, amount, label):
         self.add_operation({
             "type": "payment",
-            "author": author,
+            "author": author.id,
             "datetime": dt.datetime.now().timestamp(),
             "is_discarded": False,
             "amount": amount,
             "label": label
         })
 
-    def add_reset(self, author):
+    def add_reset(self, author: usr.User):
         snapshot = dict()
 
         users = self.get_users()
@@ -105,7 +106,7 @@ class Group:
 
         self.add_operation({
             "type": "reset",
-            "author": author,
+            "author": author.id,
             "datetime": dt.datetime.now().timestamp(),
             "is_discarded": False,
             "snapshot": snapshot,

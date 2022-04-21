@@ -4,7 +4,7 @@ import datetime
 
 class User:
     def __init__(self, user_id, username=None, name=None):
-        self.user_id = str(user_id)
+        self.id = str(user_id)
         self.username = username
         self.name = name
 
