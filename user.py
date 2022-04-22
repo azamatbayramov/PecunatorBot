@@ -3,7 +3,7 @@ import datetime
 
 
 class User:
-    def __init__(self, user_id, username=None, name=None):
+    def __init__(self, user_id: str, username: str = None, name: str = None):
         self.id = str(user_id)
         self.username = username
         self.name = name
@@ -11,24 +11,13 @@ class User:
         self.ref = db.reference(f"users/{user_id}")
         self.groups_ref = self.ref.child("groups")
 
-        self.init_user_in_db()
-
     # Initialization in database
     def init_user_in_db(self):
-        if not self.is_initialized_in_db():
-            self.create_user_info_in_db()
-            return {
-                "result": True,
-                "message": "User has been initialized"
-            }
+        self.create_user_info_in_db()
+        # We need this as a function because
+        # we might have to init more stuff later
 
-        else:
-            return {
-                "result": False,
-                "message": "User has already been already initialized"
-            }
-
-    def is_initialized_in_db(self):
+    def exists(self):
         return self.get_user_info() is not None
 
     # User info
