@@ -2,7 +2,7 @@ import group
 import user
 
 
-def get_group_and_user(message):
+def get_group_and_user(message) -> (group.Group, user.User):
     g = group.Group(
         str(message.chat.id),
         message.chat.title
