@@ -13,7 +13,7 @@ class GroupInfo(NamedTuple):
 
 
 class Group:
-    def __init__(self, group_id: str, group_name: str):
+    def __init__(self, group_id: str, group_name: str = None):
         self.id = group_id
         self.name = group_name
 
