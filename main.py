@@ -1,4 +1,6 @@
 from dotenv import load_dotenv
+load_dotenv()
+
 import firebase_admin
 from firebase_admin import credentials
 import os
@@ -6,9 +8,6 @@ import telebot
 import user
 from utils import get_group_and_user
 
-# This line should be placed before ANY logic
-# Beware of imports that execute something immediately
-load_dotenv()
 
 firebase_cred = credentials.Certificate({
     "type": "service_account",
