@@ -23,6 +23,20 @@ firebase_admin.initialize_app(firebase_cred, {"databaseURL": os.environ["FIREBAS
 bot = telebot.TeleBot(os.environ["TELEGRAM_API_TOKEN"], parse_mode=None)
 
 
+def check_init(f):
+    def rf(m):
+        g, u = get_group_and_user(m)
+
+        if not u.exists():
+            u.init_user_in_db()
+
+        if not g.exists():
+            bot.reply_to(m, "This group is not initialized")
+        else:
+            f(m)
+    return rf
+
+
 @bot.message_handler(func=lambda message: message.chat.type != "group")
 def send_welcome_in_not_group(message):
     bot.reply_to(message, "Hello. I work only in groups.\nAdd me to group and I'll work")
@@ -35,10 +49,8 @@ def start(message):
     if not g.exists():
         g.init_in_db()
         bot.reply_to(message, "This group has been initialized. Welcome!")
-    elif not g.get_user(u):
-        g.add_user(u)
-        bot.reply_to(message, "You have been added to this group")
-    else: bot.reply_to(message, "You are already a member of this group")
+    else:
+        bot.reply_to(message, "This group has already been initialized.")
 
 
 @bot.message_handler(commands=["help"])
@@ -47,6 +59,7 @@ def send_welcome(message):
 
 
 @bot.message_handler(commands=["join"])
+@check_init
 def join_user(message):
     g, u = get_group_and_user(message)
 
@@ -59,6 +72,7 @@ def join_user(message):
 
 
 @bot.message_handler(commands=["leave"])
+@check_init
 def leave_user(message):
     g, u = get_group_and_user(message)
 
@@ -75,6 +89,7 @@ def leave_user(message):
 
 
 @bot.message_handler(commands=["purchase"])
+@check_init
 def purchase(message):
     g, u = get_group_and_user(message)
 
@@ -103,6 +118,7 @@ def purchase(message):
 
 
 @bot.message_handler(commands=["total"])
+@check_init
 def total(message):
     g, u = get_group_and_user(message)
 
@@ -120,6 +136,7 @@ def total(message):
 
 
 @bot.message_handler(commands=["reset"])
+@check_init
 def reset(message):
     g, u = get_group_and_user(message)
 
