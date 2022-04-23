@@ -127,7 +127,7 @@ def total(message):
         lst = [f"Total balance: {g.get_total_balance()}", '']
 
         for user_id in users.keys():
-            lst.append(f"@{users[user_id]['username']}: {users[user_id]['balance']}")
+            lst.append(f"@{users[user_id].username}: {users[user_id].balance}")
 
         bot.reply_to(message, '\n'.join(lst))
     else:
