@@ -12,10 +12,12 @@ class GroupInfo(BaseModel):
     creation_date: int
     total_balance: int
 
+
 class UserInfo(BaseModel):
     username: str
     name: Optional[str]
     balance: int
+
 
 class Operation(BaseModel):
     type: str
@@ -23,16 +25,16 @@ class Operation(BaseModel):
     datetime: int
     is_discarded: bool
 
+
 class PaymentOperation(Operation):
     type = "payment"
     label: str
     amount: int
 
+
 class ResetOperation(Operation):
     type = "reset"
     snapshot: Dict[str, int]
-
-AnyOperation = Union[PaymentOperation, ResetOperation]
 
 
 class Group:
@@ -63,10 +65,10 @@ class Group:
         )
 
     def get_group_info(self) -> GroupInfo:
-        return GroupInfo(**self.ref.child("group_info").get()) # TODO: Fix typing
+        return GroupInfo(**self.ref.child("group_info").get())  # TODO: Fix typing
 
     def get_total_balance(self) -> int:
-        return int(self.ref.child("group_info/total_balance").get()) # TODO: Fix typing
+        return int(self.ref.child("group_info/total_balance").get())  # TODO: Fix typing
 
     def edit_total_balance(self, diff: int) -> int:
         current_balance = self.get_total_balance()
@@ -108,7 +110,7 @@ class Group:
 
     def get_users(self) -> Dict[str, UserInfo]:
         data = self.users_ref.get()
-        return { k: UserInfo(**v) for k, v in data.items() }  # TODO: Fix typing
+        return {k: UserInfo(**v) for k, v in data.items()}  # TODO: Fix typing
 
     def reset_user_balance(self, user: User) -> None:
         self.users_ref.child(user.id).update({
@@ -116,26 +118,26 @@ class Group:
         })
 
     # Operations
-    def add_operation(self, d: AnyOperation) -> None:
+    def add_operation(self, d: Operation) -> None:
         self.operations_ref.push(d.dict())
 
     def add_payment(self, author: User, amount: int, label: str) -> None:
-        self.add_operation(PaymentOperation(**{
-            "author": author.id,
-            "datetime": dt.datetime.now().timestamp(),
-            "is_discarded": False,
-            "amount": amount,
-            "label": label
-        }))
+        self.add_operation(PaymentOperation(
+            author=author.id,
+            datetime=dt.datetime.now().timestamp(),
+            is_discarded=False,
+            amount=amount,
+            label=label
+        ))
 
     def add_reset(self, author: User) -> None:
         snapshot, users = dict(), self.get_users()
         for user_id in users.keys():
             snapshot[user_id] = users[user_id].balance
 
-        self.add_operation(ResetOperation(**{
-            "author": author.id,
-            "datetime": dt.datetime.now().timestamp(),
-            "is_discarded": False,
-            "snapshot": snapshot,
-        }))
+        self.add_operation(ResetOperation(
+            author=author.id,
+            datetime=dt.datetime.now().timestamp(),
+            is_discarded=False,
+            snapshot=snapshot
+        ))
