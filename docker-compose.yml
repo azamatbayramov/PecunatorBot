@@ -1,0 +1,29 @@
+version: "3.8"
+
+services:
+  bot:
+    build: .
+    container_name: pecunator_bot
+    environment:
+      DATABASE_NAME: ${DATABASE_NAME}
+      DATABASE_USER: ${DATABASE_USER}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      DATABASE_HOST: ${DATABASE_HOST}
+      TELEGRAM_TOKEN: ${TELEGRAM_TOKEN}
+    depends_on:
+      - database
+  database:
+    image: postgres
+    container_name: pecunator_database
+    environment:
+      POSTGRES_NAME: ${DATABASE_NAME}
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      PGDATA: /data/postgres
+    ports:
+      - 5432:5432
+    volumes:
+      - volume:/data/postgres
+
+volumes:
+  volume:
