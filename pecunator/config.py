@@ -10,7 +10,7 @@ class Config(BaseSettings):
     TELEGRAM_TOKEN: str
 
     def DATABASE_URL(self) -> str:
-        return f"postgres://{self.DATABASE_USER}:{self.DATABASE_PASSWORD}@{self.DATABASE_HOST}:5432/{self.DATABASE_NAME}"
+        return f"postgresql+psycopg2://{self.DATABASE_USER}:{self.DATABASE_PASSWORD}@{self.DATABASE_HOST}:5432/{self.DATABASE_NAME}"
 
 
 @lru_cache
