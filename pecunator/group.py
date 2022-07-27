@@ -65,10 +65,12 @@ class Group:
         )
 
     def get_group_info(self) -> GroupInfo:
-        return GroupInfo(**self.ref.child("group_info").get())  # TODO: Fix typing
+        data = self.ref.child("group_info").get()
+        return None if data is None else GroupInfo(**data)  # TODO: Fix typing
 
     def get_total_balance(self) -> int:
-        return int(self.ref.child("group_info/total_balance").get())  # TODO: Fix typing
+        data = self.ref.child("group_info/total_balance").get()
+        return None if data is None else int(data)  # TODO: Fix typing
 
     def edit_total_balance(self, diff: int) -> int:
         current_balance = self.get_total_balance()
@@ -110,7 +112,7 @@ class Group:
 
     def get_users(self) -> Dict[str, UserInfo]:
         data = self.users_ref.get()
-        return {k: UserInfo(**v) for k, v in data.items()}  # TODO: Fix typing
+        return None if data is None else {k: UserInfo(**v) for k, v in data.items()}  # TODO: Fix typing
 
     def reset_user_balance(self, user: User) -> None:
         self.users_ref.child(user.id).update({
