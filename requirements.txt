@@ -2,3 +2,5 @@ python-dotenv
 firebase_admin
 pyTelegramBotAPI
 pydantic
+sqlalchemy
+psycopg2-binary
