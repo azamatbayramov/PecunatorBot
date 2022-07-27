@@ -16,7 +16,7 @@ services:
     image: postgres
     container_name: pecunator_database
     environment:
-      POSTGRES_NAME: ${DATABASE_NAME}
+      POSTGRES_DB: ${DATABASE_NAME}
       POSTGRES_USER: ${DATABASE_USER}
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
       PGDATA: /data/postgres
