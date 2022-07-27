@@ -21,7 +21,7 @@ services:
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
       PGDATA: /data/postgres
     ports:
-      - 5432:5432
+      - "5432:5432"
     volumes:
       - volume:/data/postgres
 
