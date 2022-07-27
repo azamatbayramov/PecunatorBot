@@ -7,7 +7,6 @@ class Config(BaseSettings):
     DATABASE_USER: str
     DATABASE_PASSWORD: str
     DATABASE_HOST: str
-    DATABASE_PORT: str
     TELEGRAM_TOKEN: str
 
     def DATABASE_URL(self) -> str:
