@@ -1,5 +1,4 @@
-from aiogram import Bot, Dispatcher
+import telebot
 from config import config
 
-bot = Bot(token=config.TELEGRAM_TOKEN)
-dp = Dispatcher(bot=bot)
+bot = telebot.TeleBot(config.TELEGRAM_TOKEN, parse_mode=None)
