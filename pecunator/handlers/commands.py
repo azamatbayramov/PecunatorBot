@@ -29,13 +29,20 @@ def join_user(message):
         return
 
     session = Session()
+
+    group = session.query(Group).filter(Group.telegram_id == message.chat.id).first()
+
+    if group.total_balance != 0:
+        bot.reply_to(message, "Total balance != 0. Reset balances for adding new people")
+        return
+
     session.add(User(telegram_id=message.from_user.id, group_id=message.chat.id, username=message.from_user.username, balance=0))
     session.commit()
 
     bot.reply_to(message, "You have been added to this group")
 
 
-@bot.message_handler(commands=["buy"])
+@bot.message_handler(commands=["buy", "b"])
 @validators.registered_group_required
 @validators.registered_user_required
 def buy(message):
@@ -106,7 +113,7 @@ def reset(message):
         bot.reply_to(message, "Write please: /reset {today's day}")
         return
 
-    bot.reply_to(message, f"Balances before reset:\n{utils.get_balances_str(group_id)}")
+    bot.reply_to(message, f"Balances before reset:\n{utils.get_balances_str(group_id)}\nTransactions:\n{utils.get_transactions_to_align_balances(group_id)}")
 
     session = Session()
 
