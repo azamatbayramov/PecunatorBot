@@ -12,7 +12,7 @@ def is_registered_group(telegram_id: int):
 
 
 def is_registered_user(group_id, user_id):
-    return Session().query(User).filter(User.telegram_id == user_id, Group.telegram_id == group_id).first()
+    return Session().query(User).filter(User.telegram_id == user_id, User.group_id == group_id).first()
 
 
 def group_required(func):
