@@ -29,7 +29,7 @@ def get_transactions_to_align_balances(group_id):
     answer = 'Transactions:\n'
 
     for i in transactions:
-        answer += f"{i[0]} -({i[2]})-> {i[1]}\n"
+        answer += f"{i[0]} -> {i[1]} {i[2]}\n"
 
     return answer
 
