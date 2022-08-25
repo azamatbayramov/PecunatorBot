@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, ForeignKey, DateTime
+from sqlalchemy import Column, Integer, ForeignKey, DateTime, String, Boolean
 from sqlalchemy.orm import declarative_base, relationship
 
 Base = declarative_base()
@@ -11,11 +11,12 @@ class User(Base):
 
     telegram_id = Column(Integer)
     group_id = Column(Integer, ForeignKey("groups.telegram_id"))
+    username = Column(String)
 
     balance = Column(Integer)
 
-    group = relationship("Group")
-    operations = relationship("Operation")
+    group = relationship("Group", back_populates="users")
+    operations = relationship("Operation", back_populates="author")
 
 
 class Group(Base):
@@ -25,8 +26,8 @@ class Group(Base):
 
     total_balance = Column(Integer, default=0)
 
-    users = relationship("User")
-    operations = relationship("Operation")
+    users = relationship("User", back_populates="group")
+    operations = relationship("Operation", back_populates="group")
 
 
 class Operation(Base):
@@ -37,7 +38,12 @@ class Operation(Base):
     author_id = Column(Integer, ForeignKey("users.id"))
     group_id = Column(Integer, ForeignKey("groups.telegram_id"))
 
+    amount = Column(Integer)
+    label = Column(String)
+
+    is_reset = Column(Boolean)
+
     datetime = Column(DateTime)
 
-    author = relationship("User")
-    group = relationship("Group")
+    author = relationship("User", back_populates="operations")
+    group = relationship("Group", back_populates="operations")
