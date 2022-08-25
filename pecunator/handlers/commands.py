@@ -105,3 +105,11 @@ def reset(message):
     session.add(group)
 
     session.commit()
+
+
+@bot.message_handler(commands=["align"])
+@validators.registered_group_required
+def align(message):
+    group_id = message.chat.id
+
+    bot.reply_to(message, utils.get_transactions_to_align_balances(group_id))

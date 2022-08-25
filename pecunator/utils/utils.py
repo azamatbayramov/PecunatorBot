@@ -17,9 +17,51 @@ def get_balances_str(group_id):
     return answer
 
 
-def align_balances(group_id):
+def get_transactions_to_align_balances(group_id):
     session = Session()
 
-    users = session.query(User).filter(User.group_id == group_id).all()
+    group = session.query(Group).filter(Group.telegram_id == group_id).first()
 
-    total = 0
+    users = group.users
+
+    transactions = solve_balances(users)
+
+    answer = 'Transactions:\n'
+
+    for i in transactions:
+        answer += f"{i[0]} -({i[2]})-> {i[1]}\n"
+
+    return answer
+
+
+def solve_balances(users):
+    lst = [[user.balance, user.username] for user in users]
+
+    transactions = []
+
+    average = sum([b[0] for b in lst]) / len(lst)
+
+    lst.sort(key=lambda s: s[0], reverse=True)
+
+    for i in range(len(lst)):
+        if lst[i][0] == average:
+            break
+
+        for j in range(len(lst) - 1, -1, -1):
+            if lst[j][0] == average:
+                break
+
+            c = lst[i][0] - average
+            q = average - lst[j][0]
+
+            if q >= c:
+                transactions.append((lst[j][1], lst[i][1], c))
+                lst[i][0] -= c
+                lst[j][0] += c
+            else:
+                transactions.append((lst[j][1], lst[i][1], c - q))
+                lst[i][0] -= q
+                lst[j][0] += q
+            print(lst)
+
+    return transactions
