@@ -12,11 +12,13 @@ def start(message):
 
     if validators.is_registered_group(telegram_id):
         bot.reply_to(message, "This group has already been initialized.")
-    else:
-        session = Session()
-        session.add(Group(telegram_id=telegram_id))
-        session.commit()
-        bot.reply_to(message, "This group has been initialized.")
+        return
+
+    session = Session()
+    session.add(Group(telegram_id=telegram_id))
+    session.commit()
+
+    bot.reply_to(message, "This group has been initialized.")
 
 
 @bot.message_handler(commands=["join"])
@@ -24,11 +26,13 @@ def start(message):
 def join_user(message):
     if validators.is_registered_user(message.chat.id, message.from_user.id):
         bot.reply_to(message, "You are already a member of this group")
-    else:
-        session = Session()
-        session.add(User(telegram_id=message.from_user.id, group_id=message.chat.id, username=message.from_user.username, balance=0))
-        session.commit()
-        bot.reply_to(message, "You have been added to this group")
+        return
+
+    session = Session()
+    session.add(User(telegram_id=message.from_user.id, group_id=message.chat.id, username=message.from_user.username, balance=0))
+    session.commit()
+
+    bot.reply_to(message, "You have been added to this group")
 
 
 @bot.message_handler(commands=["buy"])
@@ -56,13 +60,25 @@ def buy(message):
         return
 
     session = Session()
+
     user = session.query(User).filter(User.telegram_id == user_telegram_id, User.group_id == group_id).first()
     user.balance += amount
+
     group = session.query(Group).filter(Group.telegram_id == group_id).first()
     group.total_balance += amount
+
     session.add(group)
     session.add(user)
-    session.add(Operation(author_id=user.id, group_id=group_id, amount=amount, label=label, is_reset=False, datetime=datetime.datetime.now()))
+
+    session.add(Operation(
+        author_id=user.id,
+        group_id=group_id,
+        amount=amount,
+        label=label,
+        is_reset=False,
+        datetime=datetime.datetime.now()
+    ))
+
     session.commit()
 
     bot.reply_to(message, f"New balances:\n{utils.get_balances_str(group_id)}")
@@ -105,6 +121,8 @@ def reset(message):
     session.add(group)
 
     session.commit()
+
+    bot.reply_to(message, "Balances reset")
 
 
 @bot.message_handler(commands=["align"])
