@@ -41,7 +41,7 @@ def buy(message):
     user_telegram_id = message.from_user.id
 
     command_lst = message.text.split()
-    bot.reply_to(message, str(command_lst))
+
     if len(command_lst) < 3:
         bot.reply_to(message, "Wrong format")
         return
@@ -63,6 +63,7 @@ def buy(message):
     session.add(user)
     session.add(Operation(author_id=user.id, group_id=group_id, amount=amount, label=label, is_reset=False, datetime=datetime.datetime.now()))
     session.commit()
+    send_balances(message)
 
 
 @bot.message_handler(commands=["total"])
@@ -80,3 +81,30 @@ def send_balances(message):
         answer += f'{user.username} - {user.balance}\n'
 
     bot.reply_to(message, answer)
+
+
+@bot.message_handler(commands=["reset"])
+@validators.registered_group_required
+@validators.registered_user_required
+def reset(message):
+    group_id = message.chat.id
+    text = message.text
+
+    lst_command = message.text.split()
+
+    if len(lst_command) != 2 or lst_command[1] != str(datetime.datetime.now().day):
+        bot.reply_to(message, "Write please: /reset {today's day}")
+        return
+
+    send_balances(message)
+
+    session = Session()
+
+    group = session.query(Group).filter(Group.telegram_id == group_id).first()
+    print(group)
+
+    for user in group.users:
+        user.balance = 0
+        session.add(user)
+
+    session.commit()
