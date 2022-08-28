@@ -172,3 +172,8 @@ def help(message):
 /help, /h - get this message    
 """
     bot.reply_to(message, text)
+
+
+@bot.message_handler(commands=["ping"])
+def ping(message):
+    bot.reply_to(message, "pong")
