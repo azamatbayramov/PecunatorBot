@@ -135,7 +135,7 @@ def reset(message):
         bot.reply_to(message, "Write please: /reset {today's day}")
         return
 
-    bot.reply_to(message, f"Balances before reset:\n{utils.get_balances_str(group_id)}\nTransactions:\n{utils.get_transactions_to_align_balances(group_id)}")
+    bot.reply_to(message, f"Balances before reset:\n{utils.get_balances_str(group_id)}\n{utils.get_transactions_to_align_balances(group_id)}")
 
     session = Session()
 
