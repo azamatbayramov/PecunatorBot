@@ -42,6 +42,28 @@ def join_user(message):
     bot.reply_to(message, "You have been added to this group")
 
 
+@bot.message_handler(commands=["leave"])
+@validators.registered_group_required
+def leave_user(message):
+    session = Session()
+    user = session.query(User).filter(User.telegram_id == message.from_user.id, User.group_id == message.chat.id).first()
+
+    if not user:
+        bot.reply_to(message, "You're already not a member of this group")
+        return
+
+    group = session.query(Group).filter(Group.telegram_id == message.chat.id).first()
+
+    if group.total_balance != 0:
+        bot.reply_to(message, "Total balance != 0. Reset balances for leaving")
+        return
+
+    session.delete(user)
+    session.commit()
+
+    bot.reply_to(message, "You left the group")
+
+
 @bot.message_handler(commands=["buy", "b"])
 @validators.registered_group_required
 @validators.registered_user_required
