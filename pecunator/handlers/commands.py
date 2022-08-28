@@ -132,9 +132,21 @@ def reset(message):
     bot.reply_to(message, "Balances reset")
 
 
-@bot.message_handler(commands=["align"])
+@bot.message_handler(commands=["align", "a"])
 @validators.registered_group_required
 def align(message):
     group_id = message.chat.id
 
     bot.reply_to(message, utils.get_transactions_to_align_balances(group_id))
+
+
+@bot.message_handler(commands=["help", "h"])
+def help(message):
+    text = """
+/start - register group in system
+/join - join group with join expenses
+/buy, /b <thing> <price> - add some spending
+/align, /a - get instructions for aligning balances
+/help, /h - get this message    
+"""
+    bot.reply_to(message, text)
