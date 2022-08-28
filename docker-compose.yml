@@ -4,6 +4,7 @@ services:
   bot:
     build: .
     container_name: pecunator_bot
+    restart: "unless-stopped"
     environment:
       DATABASE_NAME: ${DATABASE_NAME}
       DATABASE_USER: ${DATABASE_USER}
@@ -13,8 +14,9 @@ services:
     depends_on:
       - database
   database:
-    image: postgres
+    image: postgres:14.1-alpine
     container_name: pecunator_database
+    restart: "unless-stopped"
     environment:
       POSTGRES_DB: ${DATABASE_NAME}
       POSTGRES_USER: ${DATABASE_USER}
