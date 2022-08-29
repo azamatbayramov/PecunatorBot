@@ -5,7 +5,7 @@ from database.database import Session
 import datetime
 
 
-@bot.message_handler(commands=["start"])
+@bot.message_handler(commands=["start", "register"])
 @validators.group_required
 def start(message):
     telegram_id = message.chat.id
