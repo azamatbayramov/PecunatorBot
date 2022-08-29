@@ -8,7 +8,7 @@ import datetime
 @bot.message_handler(commands=["start", "register"])
 @validators.group_required
 def start(message):
-    telegram_id = message.chat.id
+    telegram_id = str(message.chat.id)
 
     if validators.is_registered_group(telegram_id):
         bot.reply_to(message, "This group has already been initialized.")
@@ -24,19 +24,22 @@ def start(message):
 @bot.message_handler(commands=["join"])
 @validators.registered_group_required
 def join_user(message):
-    if validators.is_registered_user(message.chat.id, message.from_user.id):
+    group_id = str(message.chat.id)
+    user_id = str(message.from_user.id)
+
+    if validators.is_registered_user(group_id, user_id):
         bot.reply_to(message, "You are already a member of this group")
         return
 
     session = Session()
 
-    group = session.query(Group).filter(Group.telegram_id == message.chat.id).first()
+    group = session.query(Group).filter(Group.telegram_id == group_id).first()
 
     if group.total_balance != 0:
         bot.reply_to(message, "Total balance != 0. Reset balances for adding new people")
         return
 
-    session.add(User(telegram_id=message.from_user.id, group_id=message.chat.id, username=message.from_user.username, balance=0))
+    session.add(User(telegram_id=user_id, group_id=group_id, username=message.from_user.username, balance=0))
     session.commit()
 
     bot.reply_to(message, "You have been added to this group")
@@ -45,14 +48,17 @@ def join_user(message):
 @bot.message_handler(commands=["leave"])
 @validators.registered_group_required
 def leave_user(message):
+    user_id = str(message.from_user.id)
+    group_id = str(message.chat.id)
+
     session = Session()
-    user = session.query(User).filter(User.telegram_id == message.from_user.id, User.group_id == message.chat.id).first()
+    user = session.query(User).filter(User.telegram_id == user_id, User.group_id == group_id).first()
 
     if not user:
         bot.reply_to(message, "You're already not a member of this group")
         return
 
-    group = session.query(Group).filter(Group.telegram_id == message.chat.id).first()
+    group = session.query(Group).filter(Group.telegram_id == group_id).first()
 
     if group.total_balance != 0:
         bot.reply_to(message, "Total balance != 0. Reset balances for leaving")
@@ -68,8 +74,8 @@ def leave_user(message):
 @validators.registered_group_required
 @validators.registered_user_required
 def buy(message):
-    group_id = message.chat.id
-    user_telegram_id = message.from_user.id
+    group_id = str(message.chat.id)
+    user_telegram_id = str(message.from_user.id)
 
     command_lst = message.text.split()
 
@@ -116,7 +122,7 @@ def buy(message):
 @bot.message_handler(commands=["total"])
 @validators.registered_group_required
 def send_balances(message):
-    group_id = message.chat.id
+    group_id = str(message.chat.id)
 
     balances_str = utils.get_balances_str(group_id)
 
@@ -127,7 +133,7 @@ def send_balances(message):
 @validators.registered_group_required
 @validators.registered_user_required
 def reset(message):
-    group_id = message.chat.id
+    group_id = str(message.chat.id)
 
     lst_command = message.text.split()
 
@@ -157,7 +163,7 @@ def reset(message):
 @bot.message_handler(commands=["align", "a"])
 @validators.registered_group_required
 def align(message):
-    group_id = message.chat.id
+    group_id = str(message.chat.id)
 
     bot.reply_to(message, utils.get_transactions_to_align_balances(group_id))
 
@@ -165,10 +171,12 @@ def align(message):
 @bot.message_handler(commands=["help", "h"])
 def help(message):
     text = """
-/start - register group in system
+/start, /register - register group in system
 /join - join group with join expenses
+/leave - leave group with join expenses
 /buy, /b <thing> <price> - add some spending
 /align, /a - get instructions for aligning balances
+/total - get all balances
 /help, /h - get this message    
 """
     bot.reply_to(message, text)

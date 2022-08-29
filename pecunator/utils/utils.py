@@ -2,7 +2,7 @@ from database.models import Group, User, Operation
 from database.database import Session
 
 
-def get_balances_str(group_id):
+def get_balances_str(group_id: str):
     session = Session()
 
     group = session.query(Group).filter(Group.telegram_id == group_id).first()
@@ -17,7 +17,7 @@ def get_balances_str(group_id):
     return answer
 
 
-def get_transactions_to_align_balances(group_id):
+def get_transactions_to_align_balances(group_id: str):
     session = Session()
 
     group = session.query(Group).filter(Group.telegram_id == group_id).first()

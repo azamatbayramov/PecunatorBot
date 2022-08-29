@@ -9,8 +9,8 @@ class User(Base):
 
     id = Column(Integer, primary_key=True, unique=True, autoincrement=True)
 
-    telegram_id = Column(Integer)
-    group_id = Column(Integer, ForeignKey("groups.telegram_id"))
+    telegram_id = Column(String)
+    group_id = Column(String, ForeignKey("groups.telegram_id"))
     username = Column(String)
 
     balance = Column(Integer)
@@ -22,7 +22,7 @@ class User(Base):
 class Group(Base):
     __tablename__ = "groups"
 
-    telegram_id = Column(Integer, primary_key=True)
+    telegram_id = Column(String, primary_key=True)
 
     total_balance = Column(Integer, default=0)
 
@@ -36,7 +36,7 @@ class Operation(Base):
     id = Column(Integer, primary_key=True, nullable=False, unique=True)
 
     author_id = Column(Integer, ForeignKey("users.id"))
-    group_id = Column(Integer, ForeignKey("groups.telegram_id"))
+    group_id = Column(String, ForeignKey("groups.telegram_id"))
 
     amount = Column(Integer)
     label = Column(String)
