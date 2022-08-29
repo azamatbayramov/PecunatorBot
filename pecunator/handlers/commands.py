@@ -177,7 +177,8 @@ def help(message):
 /buy, /b <thing> <price> - add some spending
 /align, /a - get instructions for aligning balances
 /total - get all balances
-/help, /h - get this message    
+/help, /h - get this message
+/ping - ping bot
 """
     bot.reply_to(message, text)
 
