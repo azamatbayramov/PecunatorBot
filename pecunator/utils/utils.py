@@ -62,6 +62,5 @@ def solve_balances(users):
                 transactions.append((lst[j][1], lst[i][1], c - q))
                 lst[i][0] -= q
                 lst[j][0] += q
-            print(lst)
 
     return transactions
